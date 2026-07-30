@@ -77,15 +77,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup = InlineKeyboardMarkup(keyboard)
         await update.message.reply_text(
             "⚠️ Botdan foydalanish uchun avval quyidagi kanalimizga a'zo bo'lishingiz kerak!\n\n"
-            "A'zo bo'lgach, **\"🔄 Tekshirish\"** tugmasini bosing.",
+            "A'zo bo'lgach, \"🔄 Tekshirish\" tugmasini bosing.",
             reply_markup=reply_markup
         )
         return
 
     await update.message.reply_text(
         "Assalomu alaykum! 🎬\n\n"
-        "Ushbu bot orqali YouTube videolarini kerakli sifatda (**360p, 480p, 720p, 1080p**) yoki **MP3 (Audio)** koʻrinishida yuklab olishingiz mumkin.\n\n"
-        "Menga shunchaki video havolasini (link) yuboring! 🚀"
+        "Ushbu bot orqali YouTube videolarini MP3 yoki MP4 koʻrinishida yuklab olishingiz mumkin.\n\n"
+        "Menga shunchaki video havolasini yuboring! 🚀"
     )
 
 async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
