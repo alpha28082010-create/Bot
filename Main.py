@@ -1,16 +1,32 @@
 import os
 import asyncio
+import http.server
+import socketserver
+import threading
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 import yt_dlp
 
-# Telegram Bot Tokeningizni shu yerga kiriting
+# --- Render bepul Web Service port xatoligini oldini olish uchun veb-server ---
+def run_dummy_server():
+    port = int(os.environ.get("PORT", 8080))
+    handler = http.server.SimpleHTTPRequestHandler
+    try:
+        with socketserver.TCPServer(("", port), handler) as httpd:
+            httpd.serve_forever()
+    except Exception as e:
+        print(f"Web server xatosi: {e}")
+
+threading.Thread(target=run_dummy_server, daemon=True).start()
+# ----------------------------------------------------------------------------
+
+# Telegram Bot Tokeningiz
 TOKEN = "8879459729:AAF8F7F0oFhNj3g2cf76XElwmm3D2wlr3GQ"
 
-# ⚠️ O'z Telegram ID raqamingizni yozing (Admin uchun /stats)
+# Telegram ID (Admin uchun /stats)
 ADMIN_ID = 8756520950  
 
-# ⚠️ Kanaligiz userini yozing (masalan: @meningkanalim yoki kanal ID si)
+# Kanaligiz useri
 CHANNEL_USERNAME = "@Akkaunt_savdo26" 
 
 USER_FILE = "users.txt"
@@ -41,19 +57,16 @@ async def check_subscription(user_id: int, context: ContextTypes.DEFAULT_TYPE) -
     """Foydalanuvchi kanalga a'zo ekanligini tekshirish funksiyasi"""
     try:
         member = await context.bot.get_chat_member(chat_id=CHANNEL_USERNAME, user_id=user_id)
-        # Agar status quyidagilardan biri bo'lsa, demak a'zo
         if member.status in ['member', 'administrator', 'creator']:
             return True
         return False
     except Exception:
-        # Agar xatolik chiqsa (masalan bot admin bo'lmasa), xavfsizlik uchunFalse qaytaramiz
         return False
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     add_user(user_id)
     
-    # Kanalga a'zolikni tekshirish
     is_subscribed = await check_subscription(user_id, context)
     
     if not is_subscribed:
@@ -88,7 +101,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id
     add_user(user_id)
     
-    # Har bir xatoda ham kanalga a'zoligini tekshiramiz
     is_subscribed = await check_subscription(user_id, context)
     if not is_subscribed:
         keyboard = [
@@ -134,7 +146,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     action = query.data
 
-    # Agar foydalanuvchi "Tekshirish" tugmasini bosgan bo'lsa
     if action == "check_sub":
         is_subscribed = await check_subscription(user_id, context)
         if is_subscribed:
